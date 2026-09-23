@@ -109,4 +109,4 @@ See [NOTES.md](./NOTES.md) for:
 
 ## Sample export
 
-A sample Spectora export is included in `/sample/` — use it to test the import flow locally.
+A real Spectora-format export (`InterNACHI Residential -2026-09-23.xls`) is included in [`public/template/`](./public/template/). Use it to test the import flow locally or download it directly from the landing page of the live app.

@@ -50,7 +50,7 @@ Spectora's "Export HTML Text" includes HTML tags (`<p>`, `<strong>`, `<ul>`, etc
 
 ## How I checked my work
 
-1. **Imported the sample template** (committed to `/sample/`) and compared the section, item, and comment counts from the toast notification against a manual count in the spreadsheet.
+1. **Imported the sample template** (`public/template/InterNACHI Residential -2026-09-23.xls`) and compared the section, item, and comment counts from the toast notification against a manual count in the spreadsheet.
 2. **Saved an edit** — changed a section name and a comment body, saved, refreshed the browser, and confirmed the new values loaded from Supabase (not from React state).
 3. **Duplicated a template** — edited the copy's section name, saved, went back to the original and confirmed its section name was unchanged.
 4. **Failure cases tested**:

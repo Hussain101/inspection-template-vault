@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ClipboardList, FileSpreadsheet, PencilLine, Copy } from "lucide-react";
+import { ClipboardList, Download, FileSpreadsheet, PencilLine, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
@@ -73,6 +73,32 @@ function Landing() {
           <Button asChild size="lg" variant="outline">
             <Link to="/dashboard">Go to my templates</Link>
           </Button>
+        </div>
+
+        {/* Sample file callout */}
+        <div className="mt-8 inline-flex items-center gap-3 rounded-lg border border-border bg-card px-5 py-3">
+          <FileSpreadsheet className="size-4 shrink-0 text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">
+            No export handy?{" "}
+            <a
+              href="/template/InterNACHI Residential -2026-09-23.xls"
+              download
+              className="font-medium text-foreground underline underline-offset-4 hover:text-primary"
+            >
+              Download our sample InterNACHI Residential template
+            </a>{" "}
+            and import it to explore the app.
+          </p>
+          <a
+            href="/template/InterNACHI Residential -2026-09-23.xls"
+            download
+            className="shrink-0"
+          >
+            <Button size="sm" variant="secondary">
+              <Download className="size-3.5" />
+              Download
+            </Button>
+          </a>
         </div>
       </section>
 
