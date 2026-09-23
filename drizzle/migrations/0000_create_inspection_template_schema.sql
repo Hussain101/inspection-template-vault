@@ -112,7 +112,7 @@ FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
 CREATE OR REPLACE FUNCTION public.duplicate_template(source_id UUID, new_name TEXT DEFAULT NULL)
 RETURNS UUID
 LANGUAGE plpgsql
-SECURITY INVOKER
+SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
