@@ -8,6 +8,41 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 
+/** Map Supabase AuthError codes to plain-English toast copy. */
+function supabaseErrorMessage(error: unknown): string {
+  if (!error || typeof error !== "object") return "Something went wrong. Please try again.";
+
+  // Supabase AuthError has a `code` field and a `message` field
+  const code = (error as Record<string, unknown>)["code"] as string | undefined;
+  const message = (error as Record<string, unknown>)["message"] as string | undefined;
+
+  switch (code) {
+    case "weak_password":
+      return "That password is too common or has been found in a data breach. Please choose a stronger password.";
+    case "email_exists":
+    case "user_already_exists":
+      return "An account with that email already exists. Try signing in instead.";
+    case "invalid_credentials":
+      return "Incorrect email or password. Please try again.";
+    case "email_not_confirmed":
+      return "Please confirm your email address before signing in. Check your inbox.";
+    case "user_not_found":
+      return "No account found for that email. Create one below.";
+    case "over_email_send_rate_limit":
+      return "Too many emails sent. Please wait a few minutes before trying again.";
+    case "invalid_email":
+      return "That doesn't look like a valid email address.";
+    case "signup_disabled":
+      return "New sign-ups are currently disabled. Please contact support.";
+    case "session_not_found":
+    case "refresh_token_not_found":
+      return "Your session expired. Please sign in again.";
+    default:
+      // Fall back to the raw Supabase message if available and readable
+      return message ?? "Something went wrong. Please try again.";
+  }
+}
+
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
@@ -77,7 +112,7 @@ function AuthPage() {
       }
       await router.navigate({ to: "/dashboard" });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Something went wrong");
+      toast.error(supabaseErrorMessage(error));
     } finally {
       setBusy(false);
     }
