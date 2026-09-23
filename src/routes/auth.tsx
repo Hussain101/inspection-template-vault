@@ -1,6 +1,6 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ClipboardList, Loader2 } from "lucide-react";
+import { ClipboardList, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -8,28 +8,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 
-/** Map Supabase AuthError codes to plain-English toast copy. */
+/** Map Supabase AuthError codes and messages to clear plain-English copy. */
 function supabaseErrorMessage(error: unknown): string {
   if (!error || typeof error !== "object") return "Something went wrong. Please try again.";
 
-  // Supabase AuthError has a `code` field and a `message` field
-  const code = (error as Record<string, unknown>)["code"] as string | undefined;
-  const message = (error as Record<string, unknown>)["message"] as string | undefined;
+  const errObj = error as Record<string, unknown>;
+  const code = errObj["code"] as string | undefined;
+  const message = errObj["message"] as string | undefined;
 
   switch (code) {
     case "weak_password":
-      return "That password is too common or has been found in a data breach. Please choose a stronger password.";
+      return "That password is too weak or easy to guess. Please choose a stronger password (at least 6 characters with numbers or symbols).";
     case "email_exists":
     case "user_already_exists":
-      return "An account with that email already exists. Try signing in instead.";
+      return "An account with that email already exists. Click 'Already have an account? Sign in' below.";
     case "invalid_credentials":
-      return "Incorrect email or password. Please try again.";
+      return "Incorrect email or password. Please check your credentials and try again.";
     case "email_not_confirmed":
-      return "Please confirm your email address before signing in. Check your inbox.";
+      return "Please confirm your email address before signing in. Check your inbox or turn off email confirmation in Supabase.";
     case "user_not_found":
-      return "No account found for that email. Create one below.";
+      return "No account found for that email address. Click 'Create one' below.";
     case "over_email_send_rate_limit":
-      return "Too many emails sent. Please wait a few minutes before trying again.";
+      return "Too many requests sent. Please wait a minute before trying again.";
     case "invalid_email":
       return "That doesn't look like a valid email address.";
     case "signup_disabled":
@@ -38,8 +38,8 @@ function supabaseErrorMessage(error: unknown): string {
     case "refresh_token_not_found":
       return "Your session expired. Please sign in again.";
     default:
-      // Fall back to the raw Supabase message if available and readable
-      return message ?? "Something went wrong. Please try again.";
+      if (message && message.length > 0) return message;
+      return "Something went wrong. Please try again.";
   }
 }
 
@@ -73,6 +73,7 @@ function AuthPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [formError, setFormError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -81,11 +82,20 @@ function AuthPage() {
     });
   }, [router]);
 
+  const toggleMode = () => {
+    setFormError(null);
+    setMode(mode === "signin" ? "signup" : "signin");
+  };
+
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setFormError(null);
+
     const parsed = credentials.safeParse({ email, password });
     if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message ?? "Please check your details");
+      const msg = parsed.error.issues[0]?.message ?? "Please check your details";
+      setFormError(msg);
+      toast.error(msg);
       return;
     }
 
@@ -98,12 +108,10 @@ function AuthPage() {
         });
         if (error) throw error;
         if (!data.session) {
-          // Email confirmation is enabled in Supabase — prompt the user.
           toast.info("Account created! Check your inbox to confirm your email, then sign in.");
           setMode("signin");
           return;
         }
-        // Email confirmation is off — signed in immediately.
         toast.success("Account created! Welcome to Template Vault.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -114,7 +122,9 @@ function AuthPage() {
       }
       await router.navigate({ to: "/dashboard" });
     } catch (error) {
-      toast.error(supabaseErrorMessage(error));
+      const msg = supabaseErrorMessage(error);
+      setFormError(msg);
+      toast.error(msg);
     } finally {
       setBusy(false);
     }
@@ -138,6 +148,13 @@ function AuthPage() {
             Your templates stay private to your account.
           </p>
 
+          {formError && (
+            <div className="mt-4 flex items-start gap-2.5 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-xs leading-relaxed text-destructive">
+              <AlertCircle className="mt-0.5 size-4 shrink-0" />
+              <span>{formError}</span>
+            </div>
+          )}
+
           <form onSubmit={submit} className="mt-6 space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>
@@ -147,7 +164,10 @@ function AuthPage() {
                 autoComplete="email"
                 maxLength={255}
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (formError) setFormError(null);
+                }}
                 required
               />
             </div>
@@ -159,7 +179,10 @@ function AuthPage() {
                 autoComplete={mode === "signin" ? "current-password" : "new-password"}
                 maxLength={72}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (formError) setFormError(null);
+                }}
                 required
               />
             </div>
@@ -172,7 +195,7 @@ function AuthPage() {
           <button
             type="button"
             className="mt-6 w-full text-center text-sm text-muted-foreground underline-offset-4 hover:underline"
-            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+            onClick={toggleMode}
           >
             {mode === "signin"
               ? "No account yet? Create one"
