@@ -87,7 +87,7 @@ Spectora's "Export HTML Text" includes HTML tags (`<p>`, `<strong>`, `<ul>`, etc
 
 ## Credits and build-on
 
-- Project scaffolded from the **Lovable TanStack Start starter** (TanStack Router + Vite + Tailwind v4 + Supabase integration boilerplate). All application logic — parser, schema, editor, API layer — was written from scratch on top of that scaffold.
+- Project scaffolded with **TanStack Start** (TanStack Router + Vite + Tailwind v4 + Supabase integration boilerplate). All application logic — parser, schema, editor, API layer — was written from scratch on top of that scaffold.
 - **SheetJS** (`xlsx` package) for spreadsheet parsing.
 - **DOMPurify** for HTML sanitisation before rendering user-edited content.
 - **shadcn/ui** components (Button, Input, Textarea, AlertDialog, etc.) via the starter's pre-installed component set.
