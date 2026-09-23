@@ -95,14 +95,16 @@ function AuthPage() {
         const { data, error } = await supabase.auth.signUp({
           email: parsed.data.email,
           password: parsed.data.password,
-          options: { emailRedirectTo: `${window.location.origin}/dashboard` },
         });
         if (error) throw error;
         if (!data.session) {
-          toast.success("Check your inbox to confirm your email, then sign in.");
+          // Email confirmation is enabled in Supabase — prompt the user.
+          toast.info("Account created! Check your inbox to confirm your email, then sign in.");
           setMode("signin");
           return;
         }
+        // Email confirmation is off — signed in immediately.
+        toast.success("Account created! Welcome to Template Vault.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: parsed.data.email,
