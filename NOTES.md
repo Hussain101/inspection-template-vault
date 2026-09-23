@@ -22,7 +22,7 @@ Template Vault is a web app that lets home inspection companies migrate their Sp
 
 - **TanStack Start** (React 19, Vite 7, file-based routing with TanStack Router)
 - **Tailwind CSS v4**
-- **Supabase** — Postgres database, Row Level Security, Auth (email + Google OAuth)
+- **Supabase** — Postgres database, Row Level Security, Auth (email + password)
 - **SheetJS (xlsx)** — client-side spreadsheet parsing for csv / xlsx / xls
 - **DOMPurify** — sanitises HTML before rendering in preview mode
 
@@ -80,7 +80,7 @@ Spectora's "Export HTML Text" includes HTML tags (`<p>`, `<strong>`, `<ul>`, etc
 - **Images in comment HTML**: Spectora CDN image URLs embedded in comment bodies will not render once outside Spectora's domain.
 - **Only the first sheet is parsed**: Multi-sheet workbooks are supported but only the first sheet is read. This matches Spectora's export behaviour.
 - **Large templates**: The importer batches writes in groups of 400 rows to stay within Supabase's request limits. Templates with several thousand comments may take a few seconds to import.
-- **Google OAuth**: Requires the Supabase project to have Google as an enabled provider. Email + password auth always works.
+- **Auth**: Email + password only. Google OAuth was removed as it is not required by the brief and adds unnecessary provider configuration.
 - **No position editing**: Items and sections can be renamed but not reordered in this version.
 
 ---
